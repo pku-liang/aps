@@ -1,0 +1,17 @@
+general:
+  proj: "ntt_rocket"
+  cadl: "ntt.cadl"
+  c_file: "ntt.c"
+  c_func_eval: "pure_ntt"
+  platform: "rocc"
+
+synthesis:
+  target-period: 6.0
+  aggressive: false
+
+compile:
+  optimization_level: "O3"
+
+asic:
+  pdk: "sg13g2"
+  target-period: 6.0

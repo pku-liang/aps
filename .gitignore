@@ -1,0 +1,14 @@
+*
+!pixi.lock
+!pixi.toml
+!.gitignore
+!scripts/
+!scripts/**
+!README.md
+!aps.py
+!workspace
+!workspace/configs
+!workspace/configs/**
+!LICENSE
+!vscode-plugin/
+!vscode-plugin/**

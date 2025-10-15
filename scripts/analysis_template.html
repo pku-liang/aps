@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Output Viewer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f7;
+            color: #1d1d1f;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .tabs {
+            display: flex;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 15px 20px;
+            background: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-button:hover {
+            background: #f8f9fa;
+        }
+
+        .tab-button.active {
+            background: #007aff;
+            color: white;
+            border-bottom-color: #0056b3;
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            min-height: 500px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .function-group {
+            margin-bottom: 30px;
+        }
+
+        .function-header {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-weight: 600;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .function-group {
+            margin-bottom: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .function-header {
+            background: #f8f9fa;
+            padding: 8px 12px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #333;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+
+        .function-header:hover {
+            background: #e9ecef;
+        }
+
+        .function-content {
+            display: none;
+            background: white;
+        }
+
+        .function-content.expanded {
+            display: block;
+        }
+
+        .instruction-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .instruction-table th,
+        .instruction-table td {
+            padding: 4px 8px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .instruction-table th {
+            background: #fafafa;
+            font-weight: 600;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .instruction-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .instruction-table code {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 12px;
+        }
+
+        .function-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .function-table th,
+        .function-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .function-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #666;
+        }
+
+        .function-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+            font-size: 18px;
+        }
+
+        .error {
+            text-align: center;
+            padding: 50px;
+            color: #e74c3c;
+            font-size: 18px;
+        }
+
+        .callee-info {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .percent-bar {
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            margin-top: 5px;
+        }
+
+        .percent-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #007aff, #5856d6);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 8px;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .percent-text {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Performance analysis viewer</h1>
+            <!-- <p>Interactive visualization of instruction and function analysis data</p> -->
+        </div>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="showTab('instruction')">Instruction View</button>
+            <button class="tab-button" onclick="showTab('function')">Function View</button>
+            <button class="tab-button" onclick="showTab('isax')">ISAX View</button>
+        </div>
+
+        <div id="instruction-tab" class="tab-content active">
+            <div class="loading">Loading instructions...</div>
+        </div>
+
+        <div id="function-tab" class="tab-content">
+            <div class="loading">Loading functions...</div>
+        </div>
+
+        <div id="isax-tab" class="tab-content">
+            <div style="text-align: center; padding: 50px;">
+                <h2>ISAX View</h2>
+                <p>This view is reserved for future ISAX analysis.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let analysisData = null;
+
+        async function loadAnalysisData() {
+            try {
+                const response = await fetch('analysis_output.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                analysisData = await response.json();
+                renderInstructionView();
+                renderFunctionView();
+                renderISAXView();
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.querySelectorAll('.loading').forEach(el => {
+                    el.className = 'error';
+                    el.textContent = 'Error loading data: ' + error.message;
+                });
+            }
+        }
+
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName + '-tab').classList.add('active');
+            
+            // Add active class to selected button
+            event.target.classList.add('active');
+        }
+
+        function renderInstructionView() {
+            if (!analysisData || !analysisData.instructions) return;
+            
+            const container = document.getElementById('instruction-tab');
+            
+            // Group instructions by function
+            const functionGroups = {};
+            Object.values(analysisData.instructions).forEach(inst => {
+                const funcName = inst.function_name || 'unknown';
+                if (!functionGroups[funcName]) {
+                    functionGroups[funcName] = [];
+                }
+                functionGroups[funcName].push(inst);
+            });
+            
+            // Sort functions alphabetically
+            const sortedFunctions = Object.keys(functionGroups).sort();
+            
+            let html = '';
+            sortedFunctions.forEach((funcName, index) => {
+                const instructions = functionGroups[funcName];
+                const funcId = `func-${index}`;
+                
+                // Calculate total cycles for this function
+                const totalFunctionCycles = instructions.reduce((sum, inst) => 
+                    sum + (inst.execution_count || 0) * (inst.average_execution_cycles || 0), 0);
+                
+                const notExecuted = totalFunctionCycles === 0;
+                const tag = notExecuted ? ' <span style="color: red; font-size: 12px; margin-left: 8px;">(Not executed)</span>' : '';
+                
+                html += `
+                    <div class="function-group" ${notExecuted ? 'style="opacity: 0.7;"' : ''}>
+                        <div class="function-header" onclick="toggleFunction('${funcId}')">
+                            <span>${funcName} (${instructions.length} instructions)${tag}</span>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="function-content" id="${funcId}">
+                            <table class="instruction-table">
+                                <thead>
+                                    <tr>
+                                        <th>PC</th>
+                                        <th>Instruction</th>
+                                        <th>Count</th>
+                                        <th>CPI</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${instructions.map(inst => `
+                                        <tr>
+                                            <td>${inst.pc}</td>
+                                            <td><code>${inst.instruction}</code></td>
+                                            <td>${inst.execution_count}</td>
+                                            <td>${inst.average_execution_cycles?.toFixed(2) || '0.00'}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function toggleFunction(funcId) {
+            const content = document.getElementById(funcId);
+            const header = content.previousElementSibling;
+            const icon = header.querySelector('.toggle-icon');
+            
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                icon.textContent = '▼';
+            } else {
+                content.classList.add('expanded');
+                icon.textContent = '▲';
+            }
+        }
+
+        function renderFunctionView() {
+            if (!analysisData || !analysisData.functions) return;
+            
+            const container = document.getElementById('function-tab');
+            const functions = Object.values(analysisData.functions);
+            
+            // Find _start total cycles as baseline
+            const startFunction = functions.find(f => f.function_name === 'main');
+            const totalCycles = startFunction ? Math.round(startFunction.execution_cycles_total || 0) : 0;
+            
+            // Sort by total cycles descending (larger first)
+            const sortedFunctions = functions.sort((a, b) => 
+                (b.execution_cycles_total || 0) - (a.execution_cycles_total || 0)
+            );
+            
+            let html = `
+                <table class="function-table">
+                    <thead>
+                        <tr>
+                            <th>Function Name</th>
+                            <th>Execution Count</th>
+                            <th>Total Cycles</th>
+                            <th>Avg Cycles</th>
+                            <th>Cycle %</th>
+                            <th>Callees</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${sortedFunctions.filter(func => {
+                            const cycles = Math.round(func.execution_cycles_total || 0);
+                            const percentage = totalCycles > 0 ? (cycles / totalCycles * 100) : 0;
+                            return percentage <= 100;
+                        }).map(func => {
+                            const cycles = Math.round(func.execution_cycles_total || 0);
+                            const percentage = totalCycles > 0 ? (cycles / totalCycles * 100) : 0;
+                            return `
+                            <tr>
+                                <td><strong>${func.function_name}</strong></td>
+                                <td>${func.execution_count}</td>
+                                <td>${cycles.toLocaleString()}</td>
+                                <td>${func.execution_cycles_avg?.toFixed(2) || '0'}</td>
+                                <td>
+                                    <div style="display: flex; align-items: center; min-width: 200px;">
+                                        <div class="percent-bar">
+                                            <div class="percent-fill" style="width: ${Math.min(percentage * 1.3, 100)}%;">
+                                                ${percentage > 5 ? `${percentage.toFixed(1)}%` : ''}
+                                            </div>
+                                        </div>
+                                        <span class="percent-text">${percentage.toFixed(1)}%</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    ${func.callees_total ? 
+                                        Object.entries(func.callees_total).map(([callee, count]) => 
+                                            `<div class="callee-info">${callee}: ${count} calls${func.callees_cycle_total?.[callee] ? ` (${Math.round(func.callees_cycle_total[callee]).toLocaleString()} cycles)` : ''}</div>`
+                                        ).join('') 
+                                        : 'None'}
+                                </td>
+                            </tr>
+                        `}).join('')}
+                    </tbody>
+                </table>
+                <div style="margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 8px;">
+                    <strong>Total cycles (from _start):</strong> ${totalCycles.toLocaleString()}
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+
+        function renderISAXView() {
+            if (!analysisData || !analysisData.isax) return;
+            
+            const container = document.getElementById('isax-tab');
+            const isaxInstructions = Object.values(analysisData.isax);
+            
+            // Find main total cycles for percentage calculation
+            const functions = analysisData.functions ? Object.values(analysisData.functions) : [];
+            const startFunction = functions.find(f => f.function_name === 'main');
+            const totalCycles = startFunction ? Math.round(startFunction.execution_cycles_total || 0) : 0;
+            
+            // Sort by execution count descending
+            const sortedISAX = isaxInstructions.sort((a, b) => 
+                (b.execution_count || 0) - (a.execution_count || 0)
+            );
+            
+            let html = `
+                <div style="margin-bottom: 20px;">
+                    <h2>ISAX Instructions Analysis</h2>
+                    <p>Custom instruction generated by APS</p>
+                </div>
+                
+                <table class="function-table">
+                    <thead>
+                        <tr>
+                            <th>Address (PC)</th>
+                            <th>Instruction</th>
+                            <th>Execution Count</th>
+                            <th>CPI</th>
+                            <th>Total Cycles</th>
+                            <th>Cycle %</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${sortedISAX.map(isax => {
+                            const cycles = Math.round((isax.execution_count || 0) * (isax.average_execution_cycles || 0));
+                            const percentage = totalCycles > 0 ? (cycles / totalCycles * 100) : 0;
+                            return `
+                            <tr>
+                                <td><code>${isax.pc}</code></td>
+                                <td><code>${isax.instruction}</code></td>
+                                <td>${isax.execution_count}</td>
+                                <td>${isax.average_execution_cycles}</td>
+                                <td>${cycles.toLocaleString()}</td>
+                                <td>
+                                    <div style="display: flex; align-items: center; min-width: 200px;">
+                                        <div class="percent-bar">
+                                            <div class="percent-fill" style="width: ${Math.min(percentage * 1.3, 100)}%;">
+                                                ${percentage > 1 ? `${percentage.toFixed(1)}%` : ''}
+                                            </div>
+                                        </div>
+                                        <span class="percent-text">${percentage.toFixed(1)}%</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        `}).join('')}
+                    </tbody>
+                </table>
+                
+                <div style="margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 8px;">
+                    <strong>Total ISAX instructions:</strong> ${sortedISAX.length}
+                    <br>
+                    <strong>Total ISAX executions:</strong> ${sortedISAX.reduce((sum, isax) => sum + (isax.execution_count || 0), 0).toLocaleString()}
+                    <br>
+                    <strong>Total cycles (from _start):</strong> ${totalCycles.toLocaleString()}
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+
+        // Load data when page loads
+        document.addEventListener('DOMContentLoaded', loadAnalysisData);
+    </script>
+</body>
+</html>

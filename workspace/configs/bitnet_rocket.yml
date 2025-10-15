@@ -1,0 +1,17 @@
+general:
+  proj: "bitnet_rocket"
+  cadl: "bitnet.cadl"
+  c_file: "bitnet.c"
+  c_func_eval: "bit_linear_kernel_forward"
+  platform: "rocc"
+
+synthesis:
+  target-period: 6.0
+  aggressive: false
+
+compile:
+  optimization_level: "O0"
+
+asic:
+  pdk: "sg13g2"
+  target-period: 6.0

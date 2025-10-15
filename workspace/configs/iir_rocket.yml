@@ -1,0 +1,16 @@
+general:
+  proj: "iir_rocket"
+  cadl: "iir.cadl"
+  c_file: "iir.c"
+  c_func_eval: "pll_iir_ins"
+  platform: "rocc"
+
+synthesis:
+  target-period: 6.0
+  aggressive: false
+
+compile:
+
+asic:
+  pdk: "sg13g2"
+  target-period: 6.0

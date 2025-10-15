@@ -1,0 +1,118 @@
+[project]
+authors = ["Youwei Xiao <shallwe@pku.edu.cn>", "Yuyang Zou <yyzou25@stu.pku.edu.cn>", "Yansong Xu <xys-13@sjtu.edu.cn>", "Yuhao Luo <2022091605014@std.uestc.edu.cn>", "Yitian Sun <ytsun@stu.pku.edu.cn>", "Chenyun Yin <higgs@stu.pku.edu.cn>", "Ruifan Xu <xuruifan@pku.edu.cn>", "Renze Chen <crz@pku.edu.cn>", "Yun Liang <ericlyun@pku.edu.cn>"]
+channels = ["kuleuven-micas", "ucb-bar", "PisonJay", "conda-forge", "anaconda"]
+name = "APS"
+platforms = ["linux-64"]
+channel-priority = "disabled"
+
+[tasks]
+build = { cmd = "$PIXI_PROJECT_ROOT/scripts/init-aps.sh" }
+project = { cmd = "python aps.py {{proj}}", args = ["proj"] }
+synth = { cmd = "cd $PIXI_PROJECT_ROOT/workspace/{{ proj }} && make synth", args = ["proj"] }
+compile = { cmd = "cd $PIXI_PROJECT_ROOT/workspace/{{ proj }} && make compile", args = ["proj"] }
+sim = { cmd = "cd $PIXI_PROJECT_ROOT/workspace/{{ proj }} && make sim", args = ["proj"] }
+build-all = { cmd = "cd $PIXI_PROJECT_ROOT/workspace/{{ proj }} && make all", args = ["proj"] }
+
+[dependencies]
+python = "3.10.*"
+verilator = ">=5.32,<6"
+circt = "1.75.0.*"
+rust = "1.85.0.dev20241225.*"
+
+# Chipyard
+# binutils = ">=2.43,<3"
+autoconf = ">=2.71,<3"
+automake = ">=1.17,<2"
+coreutils = ">=9.5,<10"
+jq = ">=1.7.1,<2"
+pip = ">=23.0.1,<26"
+make = ">=4.4.1,<5"
+git = ">=2.48.1,<3"
+ninja = ">=1.12.1,<2"
+dtc = ">=1.7.2,<2"
+clang-format = ">=19.1.2,<20"
+clang-tools = ">=19.1.2,<20"
+readline = ">=8.2,<9"
+pyyaml = ">=6.0.2,<7"
+
+# RISCV-Toolchain
+gawk = ">=5.3.1,<6"
+bison = ">=3.8.2,<4"
+texinfo = ">=7.2,<8"
+patch = ">=2.7.6,<3"
+flex = ">=2.6.4,<3"
+libtool = ">=2.4.7,<3"
+file = ">=5.46,<6"
+gmp = ">=6.3.0,<7"
+mpfr = ">=4.2.1,<5"
+expat = ">=2.6.4,<3"
+ncurses = ">=6.5,<7"
+zlib = ">=1.3.1,<2"
+zstd = ">=1.5.7,<2"
+isl = ">=0.25,<0.26"
+pkg-config = ">=0.29.2,<0.30"
+cmake = ">=3.31.5,<4"
+mpc = ">=1.3.1,<2"
+gdb = ">=15.1,<16"
+gcc = ">=14.2.0,<14.3"
+gxx = ">=14.2.0,<14.3"
+conda-gcc-specs = ">=14.2.0,<15"
+sv2v = ">=v0.0.10"
+libboost-devel = ">=1.84.0,<2"
+bazel = ">=6.5.0,<8"
+
+# croc
+bender = ">=0.28.2,<0.29"
+yq = ">=3.4.3,<4"
+
+# apsc
+clang = ">=14"
+clangxx = ">=14"
+lldb = ">=19.1.2,<21"
+nodejs = ">=22.6.0,<24.5"
+typescript = ">=5.7.3,<6"
+
+[pypi-dependencies]
+certifi = ">=2025.4.26"
+click = ">=8.2.0"
+debugpy = ">=1.8.14"
+distro = ">=1.9.0"
+exceptiongroup = ">=1.3.0"
+filelock = ">=3.18.0"
+importlib-resources = ">=6.5.2"
+parse = ">=1.20.2"
+pathlib = ">=1.0.1"
+psutil = ">=7.0.0"
+py-cpuinfo = ">=9.0.0"
+pycparser = ">=2.22"
+pyparsing = ">=3.2.3"
+pymlir = ">=0.5"
+numpy = ">=2.2.4"
+pyyaml = ">=6.0.2"
+llvmlite = ">=0.44.0"
+nanobind = ">=2.7.0"
+pyelftools = ">=0.32"
+typing-extensions = ">=4.13.2"
+typing-inspection = ">=0.4.0"
+tqdm = ">=4.67.1"
+traits = ">=7.0.2"
+
+[feature.java.dependencies]
+sbt = ">=1.10.2,<2"
+openjdk = "20.*"
+
+[feature.asic.dependencies]
+yosys = ">=0.50,<0.51"
+openroad = "2.0_16235_gedf0dff9.*"
+klayout = "0.28.*"
+magic = "8.3.*"
+netgen = "1.*"
+libboost = ">=1.86.0,<1.87"
+
+[feature.riscv-custom.activation.env]
+RISCV = "$PIXI_PROJECT_ROOT/riscv-toolchain/root"
+PATH = "$PIXI_PROJECT_ROOT/bin:$RISCV/bin:$PATH"
+APS_ENV = "set"
+
+[environments]
+aps = ["java", "riscv-custom", "asic"]

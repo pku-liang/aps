@@ -1,0 +1,17 @@
+general:
+  proj: "bitnet_croc"
+  cadl: "bitnet.cadl"
+  c_file: "bitnet.c"
+  c_func_eval: "bit_linear_kernel_forward"
+  platform: "croc"
+
+synthesis:
+  target-period: 12.5
+  aggressive: false
+
+compile:
+  optimization_level: "O0"
+
+asic:
+  pdk: "sg13g2"
+  target-period: 12.5

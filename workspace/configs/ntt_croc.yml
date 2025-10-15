@@ -1,0 +1,17 @@
+general:
+  proj: "ntt_croc"
+  cadl: "ntt.cadl"
+  c_file: "ntt.c"
+  c_func_eval: "pure_ntt"
+  platform: "croc"
+
+synthesis:
+  target-period: 12.5
+  aggressive: false
+
+compile:
+  optimization_level: "O3"
+
+asic:
+  pdk: "sg13g2"
+  target-period: 12.5 

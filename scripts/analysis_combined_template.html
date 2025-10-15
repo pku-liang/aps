@@ -1,0 +1,2586 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design Report - ISAX_NAME</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f7;
+            color: #1d1d1f;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .level1-tabs {
+            display: flex;
+            background: #2c3e50;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .level1-tab-button {
+            flex: 1;
+            padding: 18px 25px;
+            background: #2c3e50;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            color: #bdc3c7;
+            border-bottom: 4px solid transparent;
+        }
+
+        .level1-tab-button:hover {
+            background: #34495e;
+            color: #ecf0f1;
+        }
+
+        .level1-tab-button.active {
+            background: #3498db;
+            color: white;
+            border-bottom-color: #2980b9;
+        }
+
+        .level2-tabs {
+            display: flex;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .level2-tab-button {
+            flex: 1;
+            padding: 15px 20px;
+            background: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .level2-tab-button:hover {
+            background: #f8f9fa;
+        }
+
+        .level2-tab-button.active {
+            background: #007aff;
+            color: white;
+            border-bottom-color: #0056b3;
+        }
+
+        .level1-tab-content {
+            display: none;
+        }
+
+        .level1-tab-content.active {
+            display: block;
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            min-height: 500px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .version-controls {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .version-toggle {
+            padding: 8px 16px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .version-toggle:hover {
+            background: #e9ecef;
+        }
+
+        .version-toggle.active {
+            background: #007aff;
+            color: white;
+            border-color: #007aff;
+        }
+
+        .version-toggle.unopt.active {
+            background: #ff3b30;
+            border-color: #ff3b30;
+        }
+
+        .comparison-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .version-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .version-badge.opt {
+            background: #007aff;
+            color: white;
+        }
+
+        .version-badge.unopt {
+            background: #ff3b30;
+            color: white;
+        }
+
+        .speedup-info {
+            font-size: 18px;
+            font-weight: 600;
+            color: #28a745;
+        }
+
+        .function-group {
+            margin-bottom: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .function-header {
+            background: #f8f9fa;
+            padding: 8px 12px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #333;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+
+        .function-header:hover {
+            background: #e9ecef;
+        }
+
+        .function-content {
+            display: none;
+            background: white;
+        }
+
+        .function-content.expanded {
+            display: block;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .comparison-table th {
+            background: #fafafa;
+            font-weight: 600;
+            color: #666;
+            font-size: 12px;
+            position: sticky;
+            top: 0;
+        }
+
+        .comparison-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .comparison-table code {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 12px;
+        }
+
+        .cycle-diff {
+            font-weight: 600;
+        }
+
+        .cycle-diff.improvement {
+            color: #28a745;
+        }
+
+        .cycle-diff.degradation {
+            color: #dc3545;
+        }
+
+        .cycle-diff.same {
+            color: #6c757d;
+        }
+
+        .function-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .function-table th,
+        .function-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .function-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #666;
+        }
+
+        .function-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+            font-size: 18px;
+        }
+
+        .error {
+            text-align: center;
+            padding: 50px;
+            color: #e74c3c;
+            font-size: 18px;
+        }
+
+        .callee-info {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .percent-bar {
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            margin-top: 5px;
+        }
+
+        .percent-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #007aff, #5856d6);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 8px;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .percent-text {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            margin-left: 10px;
+        }
+
+        .data-toggle {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .toggle-btn {
+            padding: 8px 16px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .toggle-btn.active {
+            background: #007aff;
+            color: white;
+            border-color: #007aff;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .file-info-box {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 16px 20px;
+            margin-bottom: 16px;
+        }
+
+        .file-info-box h3 {
+            margin: 0;
+            color: #333;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            transition: all 0.2s;
+        }
+
+        .file-info-box h3:hover {
+            color: #007aff;
+        }
+
+        .file-info-box h3 .toggle-icon {
+            font-size: 14px;
+            transition: transform 0.2s;
+        }
+
+        .file-info-box h3.collapsed .toggle-icon {
+            transform: rotate(-90deg);
+        }
+
+        .file-info-box.collapsed {
+            padding-bottom: 4px;
+        }
+
+        .file-info-box.collapsed .file-grid {
+            display: none;
+        }
+
+        .file-info-box:not(.collapsed) h3 {
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .file-info-box:not(.collapsed) .file-grid {
+            margin-top: 15px;
+        }
+
+        .file-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 12px;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #007aff;
+        }
+
+        .file-item.verilog {
+            border-left-color: #28a745;
+        }
+
+        .file-label {
+            font-weight: 600;
+            color: #333;
+            margin-right: 8px;
+            min-width: 100px;
+            font-size: 13px;
+        }
+
+        .file-name {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            background: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+            color: #495057;
+            font-size: 14px;
+        }
+
+        .file-not-found {
+            opacity: 0.6;
+            border-left-color: #dc3545 !important;
+        }
+
+        .file-not-found .file-name {
+            color: #dc3545;
+            font-style: italic;
+        }
+
+        .file-name.clickable {
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .file-name.clickable:hover {
+            background: #e3f2fd;
+            transform: scale(1.02);
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 2% auto;
+            padding: 0;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 1200px;
+            height: 85vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin: 0;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 0;
+            background: none;
+            border: none;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .close:hover {
+            color: #000;
+            background: #e9ecef;
+        }
+
+        .modal-body {
+            flex: 1;
+            padding: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .file-content {
+            flex: 1;
+            overflow: auto;
+            background: #f8f9fa;
+            border-radius: 0 0 12px 12px;
+        }
+
+        .code-container {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            line-height: 1.0;
+            padding: 20px;
+            margin: 0;
+            height: 100%;
+            overflow: auto;
+            white-space: pre;
+            tab-size: 4;
+        }
+
+        .line-numbers {
+            color: #858585;
+            user-select: none;
+            display: inline-block;
+            width: 50px;
+            text-align: right;
+            margin-right: 15px;
+            border-right: 1px solid #404040;
+            padding-right: 10px;
+        }
+
+        .code-line {
+            display: block;
+        }
+
+        .loading-text {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+            font-size: 16px;
+        }
+
+        .error-text {
+            text-align: center;
+            padding: 50px;
+            color: #dc3545;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>APS Design Report - ISAX_NAME</h1>
+        </div>
+
+        <div class="file-info-box" id="fileInfoBox">
+            <h3 onclick="toggleFilePanel()">
+                Project Files
+                <span class="toggle-icon">▼</span>
+            </h3>
+            <div class="file-grid" id="file-grid">
+                <!-- Files will be dynamically loaded -->
+            </div>
+        </div>
+
+        <!-- Level 1 Navigation -->
+        <div class="level1-tabs">
+            <button class="level1-tab-button active" onclick="showLevel1Tab('synthesis')">Synthesis</button>
+            <button class="level1-tab-button" onclick="showLevel1Tab('compilation')">Compilation</button>
+            <button class="level1-tab-button" onclick="showLevel1Tab('performance')">Performance</button>
+            <button class="level1-tab-button" onclick="showLevel1Tab('implementation')">Implementation</button>
+        </div>
+
+        <!-- Synthesis Section -->
+        <div id="synthesis-section" class="level1-tab-content active">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                <!-- ISAXes Card -->
+                <div class="file-info-box">
+                    <h3 onclick="toggleSynthesisPanel('isaxes-panel')">
+                        ISAXes
+                        <span class="toggle-icon">▼</span>
+                    </h3>
+                    <div id="isaxes-panel" class="synthesis-content">
+                        <div class="loading">Loading ISAXes...</div>
+                    </div>
+                </div>
+
+                <!-- Instances Card -->
+                <div class="file-info-box">
+                    <h3 onclick="toggleSynthesisPanel('instances-panel')">
+                        Global Instances
+                        <span class="toggle-icon">▼</span>
+                    </h3>
+                    <div id="instances-panel" class="synthesis-content">
+                        <div class="loading">Loading instances...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Synthesis Files Viewer -->
+            <!-- <div class="file-info-box">
+                <h3 onclick="toggleSynthesisPanel('synthesis-files-panel')">
+                    Synthesis Files
+                    <span class="toggle-icon">▼</span>
+                </h3>
+                <div id="synthesis-files-panel" class="synthesis-content">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px;">
+                        <div class="file-item verilog">
+                            <span class="file-label">Schedule Log:</span>
+                            <span class="file-name clickable"
+                                onclick="openFileModal('../synth/mulsh4.schedule.log', 'Schedule Report')">mulsh4.schedule.log</span>
+                        </div>
+                        <div class="file-item verilog">
+                            <span class="file-label">SIR:</span>
+                            <span class="file-name clickable"
+                                onclick="openFileModal('../synth/mulsh4.sir', 'SIR File')">mulsh4.sir</span>
+                        </div>
+                        <div class="file-item verilog">
+                            <span class="file-label">SSIR:</span>
+                            <span class="file-name clickable"
+                                onclick="openFileModal('../synth/mulsh4.ssir', 'SSIR File')">mulsh4.ssir</span>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+        </div>
+
+        <!-- Compilation Section -->
+        <div id="compilation-section" class="level1-tab-content">
+            <!-- Pattern Match Report -->
+            <div class="file-info-box">
+                <h3 onclick="toggleSynthesisPanel('patmatch-content')">
+                    Pattern Match Report
+                    <span class="toggle-icon">▼</span>
+                </h3>
+                <div id="patmatch-content" class="synthesis-content">
+                    <div class="loading">Loading pattern match report...</div>
+                </div>
+            </div>
+
+            <!-- Vector Report -->
+            <div class="file-info-box">
+                <h3 onclick="toggleSynthesisPanel('vec-content')">
+                    Vectorization Report
+                    <span class="toggle-icon">▼</span>
+                </h3>
+                <div id="vec-content" class="synthesis-content">
+                    <div class="loading">Loading vectorizaiton report...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Section -->
+        <div id="performance-section" class="level1-tab-content">
+            <!-- Level 2 Navigation for Performance -->
+            <div class="level2-tabs">
+                <button class="level2-tab-button active"
+                    onclick="showLevel2Tab('performance', 'summary')">Summary</button>
+                <button class="level2-tab-button" onclick="showLevel2Tab('performance', 'instruction')">Instruction
+                    View</button>
+                <button class="level2-tab-button" onclick="showLevel2Tab('performance', 'function')">Function
+                    View</button>
+                <button class="level2-tab-button" onclick="showLevel2Tab('performance', 'isax')">ISAX View</button>
+            </div>
+
+            <div id="performance-summary-tab" class="tab-content active">
+                <div class="loading">Loading comparison data...</div>
+            </div>
+
+            <div id="performance-instruction-tab" class="tab-content">
+                <div class="version-controls">
+                    <div class="version-toggle active" data-version="both" onclick="toggleVersion(this, 'both')">Show
+                        Comparison</div>
+                    <div class="version-toggle unopt" data-version="unopt" onclick="toggleVersion(this, 'unopt')">
+                        Unoptimized Only</div>
+                    <div class="version-toggle" data-version="opt" onclick="toggleVersion(this, 'opt')">Optimized Only
+                    </div>
+                </div>
+                <div class="loading">Loading instructions...</div>
+            </div>
+
+            <div id="performance-function-tab" class="tab-content">
+                <div class="data-toggle">
+                    <div class="toggle-btn active" onclick="toggleFunctionData('both')">Show Comparison</div>
+                    <div class="toggle-btn" onclick="toggleFunctionData('unopt')">Unoptimized Only</div>
+                    <div class="toggle-btn" onclick="toggleFunctionData('opt')">Optimized Only</div>
+                </div>
+                <div class="loading">Loading functions...</div>
+            </div>
+
+            <div id="performance-isax-tab" class="tab-content">
+                <div class="data-toggle">
+                    <div class="toggle-btn active" onclick="toggleISAXData('both')">Show Comparison</div>
+                    <div class="toggle-btn" onclick="toggleISAXData('unopt')">Unoptimized Only</div>
+                    <div class="toggle-btn" onclick="toggleISAXData('opt')">Optimized Only</div>
+                </div>
+                <div class="loading">Loading ISAX data...</div>
+            </div>
+        </div>
+
+        <!-- Implementation Section -->
+        <div id="implementation-section" class="level1-tab-content">
+            <div class="file-info-box">
+                <h3 onclick="toggleSynthesisPanel('asic-image-content')">
+                    ASIC Layout Image
+                    <span class="toggle-icon">▼</span>
+                </h3>
+                <div id="asic-image-content" class="synthesis-content">
+                    <div class="loading">Loading ASIC Layout Image...</div>
+                </div>
+            </div>
+            <div class="file-info-box">
+                <h3 onclick="toggleSynthesisPanel('asic-summary-content')">
+                    Chip Summary
+                    <span class="toggle-icon">▼</span>
+                </h3>
+                <div id="asic-summary-content" class="synthesis-content">
+                    <div class="loading">Loading ASIC Summary...</div>
+                </div>
+            </div>
+            <div class="file-info-box">
+                <h3 onclick="toggleSynthesisPanel('asic-area-content')">
+                    Hiearchical area detail
+                    <span class="toggle-icon">▼</span>
+                </h3>
+                <div id="asic-area-content" class="synthesis-content">
+                    <div class="loading">Loading ASIC Area...</div>
+                </div>
+            </div>
+            <div class="file-info-box">
+                <h3 onclick="toggleSynthesisPanel('asic-timing-content')">
+                    Critical path detail
+                    <span class="toggle-icon">▼</span>
+                </h3>
+                <div id="asic-timing-content" class="synthesis-content">
+                    <div class="loading">Loading ASIC Timing...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- File Viewer Modal -->
+    <div id="fileModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">File Viewer</h3>
+                <button class="close" onclick="closeFileModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="file-content" id="fileContent">
+                    <div class="loading-text">Loading file...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let unoptData = null;
+        let optData = null;
+        let currentInstructionView = 'both';
+        let currentFunctionView = 'both';
+        let currentISAXView = 'both';
+
+        function getFileList() {
+            // These placeholders will be replaced by the Makefile
+            const files = {
+                sourceFile: '../../SOURCE_FILE_PATH',
+                cadlFile: '../../CADL_FILE_PATH', 
+                unoptLLIR: '../../UNOPT_LLIR_PATH',
+                optLLIR: '../../OPT_LLIR_PATH',
+                verilogSV: '../../VERILOG_SV_PATH',
+                verilogFIR: '../../VERILOG_FIR_PATH',
+                semanticJSON: '../../SEMANTIC_JSON_PATH',
+                synthJSON: '../../SYNTH_JSON_PATH',
+                unoptSimJSON: '../../UNOPT_JSON_FILE',
+                optSimJSON: '../../OPT_JSON_FILE',
+                patMatchRpt: '../../PAT_MATCH_RPT_PATH',
+                vecRpt: '../../VEC_MATCH_RPT_PATH',
+                asicRptFinal: '../../ASIC_RPT_PATH'
+            };
+            return files;
+        }
+
+        function loadFileInfo() {
+            const fileGrid = document.getElementById('file-grid');
+
+            const files = getFileList();
+
+            const hardwareFiles = [
+                { label: 'CADL', file: files.cadlFile },
+                { label: 'SystemVerilog', file: files.verilogSV },
+                { label: 'FIRRTL', file: files.verilogFIR },
+                { label: 'Semantic JSON', file: files.semanticJSON }
+            ];
+
+            const softwareFiles = [
+                { label: 'Source File', file: files.sourceFile },
+                { label: 'Unopt LLIR', file: files.unoptLLIR },
+                { label: 'Opt LLIR', file: files.optLLIR }
+            ];
+
+            let fileHtml = '<div style="margin-bottom: 30px;">';
+
+            // Hardware section
+            fileHtml += `
+                <h4 style="margin-bottom: 15px; color: #28a745; font-size: 16px; font-weight: 600;">
+                    Hardware Files
+                </h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-bottom: 25px;">
+            `;
+
+            for (const fileType of hardwareFiles) {
+                const fileFound = !fileType.file.includes('_PATH'); // Check if placeholder was replaced
+                const fileName = fileFound ? fileType.file.split('/').pop() : 'Not found'; // Extract just the filename
+                const fileItemClass = fileFound ? 'file-item verilog' : 'file-item file-not-found verilog';
+                const fileNameClass = fileFound ? 'file-name clickable' : 'file-name';
+                const clickHandler = fileFound ? `onclick="openFileModal('${fileType.file}', '${fileType.label}')"` : '';
+
+                fileHtml += `
+                    <div class="${fileItemClass}">
+                        <span class="file-label">${fileType.label}:</span>
+                        <span class="${fileNameClass}" ${clickHandler}>${fileName}</span>
+                    </div>
+                `;
+            }
+
+            fileHtml += '</div>';
+
+            // Software section
+            fileHtml += `
+                <h4 style="margin-bottom: 15px; color: #007aff; font-size: 16px; font-weight: 600;">
+                    Software Files
+                </h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px;">
+            `;
+
+            for (const fileType of softwareFiles) {
+                const fileFound = !fileType.file.includes('_PATH'); // Check if placeholder was replaced
+                const fileName = fileFound ? fileType.file.split('/').pop() : 'Not found'; // Extract just the filename
+                const fileItemClass = fileFound ? 'file-item' : 'file-item file-not-found';
+                const fileNameClass = fileFound ? 'file-name clickable' : 'file-name';
+                const clickHandler = fileFound ? `onclick="openFileModal('${fileType.file}', '${fileType.label}')"` : '';
+
+                fileHtml += `
+                    <div class="${fileItemClass}">
+                        <span class="file-label">${fileType.label}:</span>
+                        <span class="${fileNameClass}" ${clickHandler}>${fileName}</span>
+                    </div>
+                `;
+            }
+
+            fileHtml += '</div></div>';
+
+            fileGrid.innerHTML = fileHtml;
+        }
+
+        async function loadAnalysisData() {
+            try {
+                let files = getFileList();
+                const [unoptResponse, optResponse] = await Promise.all([
+                    fetch(files.unoptSimJSON),
+                    fetch(files.optSimJSON)
+                ]);
+
+                if (!unoptResponse.ok || !optResponse.ok) {
+                    throw new Error('Failed to load data files');
+                }
+
+                unoptData = await unoptResponse.json();
+                optData = await optResponse.json();
+
+                renderInstructionView();
+                renderFunctionView();
+                renderISAXView();
+                renderComparisonView();
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.querySelectorAll('.loading').forEach(el => {
+                    el.className = 'error';
+                    el.textContent = 'Error loading data: ' + error.message;
+                });
+            }
+        }
+
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName + '-tab').classList.add('active');
+
+            // Add active class to selected button
+            event.target.classList.add('active');
+        }
+
+        function toggleVersion(element, version) {
+            document.querySelectorAll('.version-toggle').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+            currentInstructionView = version;
+            renderInstructionView();
+        }
+
+        function toggleFunctionData(view) {
+            document.querySelectorAll('#function-tab .toggle-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            currentFunctionView = view;
+            renderFunctionView();
+        }
+
+        function toggleISAXData(view) {
+            document.querySelectorAll('#isax-tab .toggle-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            currentISAXView = view;
+            renderISAXView();
+        }
+
+        function renderInstructionView() {
+            if (!unoptData || !optData) return;
+
+            const container = document.getElementById('instruction-tab');
+            const versionControls = container.querySelector('.version-controls');
+
+            let html = '';
+
+            if (currentInstructionView === 'both') {
+                html = renderInstructionComparison();
+            } else if (currentInstructionView === 'unopt') {
+                html = renderSingleVersionInstructions(unoptData, 'Unoptimized');
+            } else {
+                html = renderSingleVersionInstructions(optData, 'Optimized');
+            }
+
+            container.innerHTML = '';
+            container.appendChild(versionControls);
+            container.insertAdjacentHTML('beforeend', html);
+        }
+
+        function renderInstructionComparison() {
+            if (!unoptData?.instructions || !optData?.instructions) return '<div class="error">No instruction data available</div>';
+
+            // Merge instruction data from both versions
+            const allInstructions = {};
+
+            // Add unoptimized instructions
+            Object.values(unoptData.instructions).forEach(inst => {
+                const key = `${inst.function_name}_${inst.pc}`;
+                allInstructions[key] = {
+                    pc: inst.pc,
+                    instruction: inst.instruction,
+                    function_name: inst.function_name,
+                    unopt_count: inst.execution_count || 0,
+                    unopt_cycles: inst.average_execution_cycles || 0,
+                    opt_count: 0,
+                    opt_cycles: 0
+                };
+            });
+
+            // Add optimized instructions
+            Object.values(optData.instructions).forEach(inst => {
+                const key = `${inst.function_name}_${inst.pc}`;
+                if (allInstructions[key]) {
+                    allInstructions[key].opt_count = inst.execution_count || 0;
+                    allInstructions[key].opt_cycles = inst.average_execution_cycles || 0;
+                } else {
+                    allInstructions[key] = {
+                        pc: inst.pc,
+                        instruction: inst.instruction,
+                        function_name: inst.function_name,
+                        unopt_count: 0,
+                        unopt_cycles: 0,
+                        opt_count: inst.execution_count || 0,
+                        opt_cycles: inst.average_execution_cycles || 0
+                    };
+                }
+            });
+
+            // Group by function
+            const functionGroups = {};
+            Object.values(allInstructions).forEach(inst => {
+                const funcName = inst.function_name || 'unknown';
+                if (!functionGroups[funcName]) {
+                    functionGroups[funcName] = [];
+                }
+                functionGroups[funcName].push(inst);
+            });
+
+            const sortedFunctions = Object.keys(functionGroups).sort();
+
+            let html = '';
+            sortedFunctions.forEach((funcName, index) => {
+                const instructions = functionGroups[funcName];
+                const funcId = `func-${index}`;
+
+                html += `
+                    <div class="function-group">
+                        <div class="function-header" onclick="toggleFunction('${funcId}')">
+                            <span>${funcName} (${instructions.length} instructions)</span>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="function-content" id="${funcId}">
+                            <table class="comparison-table">
+                                <thead>
+                                    <tr>
+                                        <th>PC</th>
+                                        <th>Instruction</th>
+                                        <th>Unopt Count</th>
+                                        <th>Unopt CPI</th>
+                                        <th>Opt Count</th>
+                                        <th>Opt CPI</th>
+                                        <th>Count Diff</th>
+                                        <th>CPI Diff</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${instructions.map(inst => {
+                    const countDiff = inst.opt_count - inst.unopt_count;
+                    const cycleDiff = inst.opt_cycles - inst.unopt_cycles;
+                    const countDiffClass = countDiff < 0 ? 'improvement' : countDiff > 0 ? 'degradation' : 'same';
+                    const cycleDiffClass = cycleDiff < 0 ? 'improvement' : cycleDiff > 0 ? 'degradation' : 'same';
+
+                    return `
+                                        <tr>
+                                            <td>${inst.pc}</td>
+                                            <td><code>${inst.instruction}</code></td>
+                                            <td>${inst.unopt_count}</td>
+                                            <td>${inst.unopt_cycles.toFixed(2)}</td>
+                                            <td>${inst.opt_count}</td>
+                                            <td>${inst.opt_cycles.toFixed(2)}</td>
+                                            <td class="cycle-diff ${countDiffClass}">${countDiff >= 0 ? '+' : ''}${countDiff}</td>
+                                            <td class="cycle-diff ${cycleDiffClass}">${cycleDiff >= 0 ? '+' : ''}${cycleDiff.toFixed(2)}</td>
+                                        </tr>
+                                    `}).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            });
+
+            return html;
+        }
+
+        function renderSingleVersionInstructions(data, versionName) {
+            if (!data?.instructions) return '<div class="error">No instruction data available</div>';
+
+            const functionGroups = {};
+            Object.values(data.instructions).forEach(inst => {
+                const funcName = inst.function_name || 'unknown';
+                if (!functionGroups[funcName]) {
+                    functionGroups[funcName] = [];
+                }
+                functionGroups[funcName].push(inst);
+            });
+
+            const sortedFunctions = Object.keys(functionGroups).sort();
+
+            let html = `<div class="comparison-header">
+                <h3>${versionName} Version Instructions</h3>
+            </div>`;
+
+            sortedFunctions.forEach((funcName, index) => {
+                const instructions = functionGroups[funcName];
+                const funcId = `func-${index}`;
+
+                const totalFunctionCycles = instructions.reduce((sum, inst) =>
+                    sum + (inst.execution_count || 0) * (inst.average_execution_cycles || 0), 0);
+
+                const notExecuted = totalFunctionCycles === 0;
+                const tag = notExecuted ? ' <span style="color: red; font-size: 12px; margin-left: 8px;">(Not executed)</span>' : '';
+
+                html += `
+                    <div class="function-group" ${notExecuted ? 'style="opacity: 0.7;"' : ''}>
+                        <div class="function-header" onclick="toggleFunction('${funcId}')">
+                            <span>${funcName} (${instructions.length} instructions)${tag}</span>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="function-content" id="${funcId}">
+                            <table class="comparison-table">
+                                <thead>
+                                    <tr>
+                                        <th>PC</th>
+                                        <th>Instruction</th>
+                                        <th>Count</th>
+                                        <th>CPI</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${instructions.map(inst => `
+                                        <tr>
+                                            <td>${inst.pc}</td>
+                                            <td><code>${inst.instruction}</code></td>
+                                            <td>${inst.execution_count}</td>
+                                            <td>${inst.average_execution_cycles?.toFixed(2) || '0.00'}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            });
+
+            return html;
+        }
+
+        function renderFunctionView() {
+            if (!unoptData || !optData) return;
+
+            const container = document.getElementById('function-tab');
+            const controls = container.querySelector('.data-toggle');
+
+            let html = '';
+
+            if (currentFunctionView === 'both') {
+                html = renderFunctionComparison();
+            } else if (currentFunctionView === 'unopt') {
+                html = renderSingleVersionFunctions(unoptData, 'Unoptimized');
+            } else {
+                html = renderSingleVersionFunctions(optData, 'Optimized');
+            }
+
+            container.innerHTML = '';
+            container.appendChild(controls);
+            container.insertAdjacentHTML('beforeend', html);
+        }
+
+        function renderFunctionComparison() {
+            if (!unoptData?.functions || !optData?.functions) return '<div class="error">No function data available</div>';
+
+            const unoptFunctions = Object.values(unoptData.functions);
+            const optFunctions = Object.values(optData.functions);
+
+            // Find main functions for total cycles calculation
+            const unoptMain = unoptFunctions.find(f => f.function_name === 'main');
+            const optMain = optFunctions.find(f => f.function_name === 'main');
+            const unoptTotalCycles = unoptMain ? Math.round(unoptMain.execution_cycles_total || 0) : 0;
+            const optTotalCycles = optMain ? Math.round(optMain.execution_cycles_total || 0) : 0;
+
+            // Merge function data
+            const allFunctions = {};
+
+            unoptFunctions.forEach(func => {
+                allFunctions[func.function_name] = {
+                    function_name: func.function_name,
+                    unopt_execution_count: func.execution_count || 0,
+                    unopt_cycles_total: Math.round(func.execution_cycles_total || 0),
+                    unopt_cycles_avg: func.execution_cycles_avg || 0,
+                    opt_execution_count: 0,
+                    opt_cycles_total: 0,
+                    opt_cycles_avg: 0
+                };
+            });
+
+            optFunctions.forEach(func => {
+                if (allFunctions[func.function_name]) {
+                    allFunctions[func.function_name].opt_execution_count = func.execution_count || 0;
+                    allFunctions[func.function_name].opt_cycles_total = Math.round(func.execution_cycles_total || 0);
+                    allFunctions[func.function_name].opt_cycles_avg = func.execution_cycles_avg || 0;
+                } else {
+                    allFunctions[func.function_name] = {
+                        function_name: func.function_name,
+                        unopt_execution_count: 0,
+                        unopt_cycles_total: 0,
+                        unopt_cycles_avg: 0,
+                        opt_execution_count: func.execution_count || 0,
+                        opt_cycles_total: Math.round(func.execution_cycles_total || 0),
+                        opt_cycles_avg: func.execution_cycles_avg || 0
+                    };
+                }
+            });
+
+            const sortedFunctions = Object.values(allFunctions).sort((a, b) =>
+                Math.max(b.unopt_cycles_total, b.opt_cycles_total) - Math.max(a.unopt_cycles_total, a.opt_cycles_total)
+            );
+
+            const speedup = unoptTotalCycles > 0 && optTotalCycles > 0 ?
+                (unoptTotalCycles / optTotalCycles).toFixed(2) : 'N/A';
+
+            let html = `
+                <div class="comparison-header">
+                    <div>
+                        <span class="version-badge unopt">Unoptimized: ${unoptTotalCycles.toLocaleString()} cycles</span>
+                        <span class="version-badge opt">Optimized: ${optTotalCycles.toLocaleString()} cycles</span>
+                    </div>
+                    <div class="speedup-info">Speedup: ${speedup}x</div>
+                </div>
+                
+                <table class="function-table">
+                    <thead>
+                        <tr>
+                            <th>Function Name</th>
+                            <th>Unopt Count</th>
+                            <th>Unopt Total Cycles</th>
+                            <th>Unopt Avg Cycles</th>
+                            <th>Opt Count</th>
+                            <th>Opt Total Cycles</th>
+                            <th>Opt Avg Cycles</th>
+                            <th>Total Cycles Diff</th>
+                            <th>Speedup</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${sortedFunctions.map(func => {
+                const cycleDiff = func.opt_cycles_total - func.unopt_cycles_total;
+                const cyclesDiffClass = cycleDiff < 0 ? 'improvement' : cycleDiff > 0 ? 'degradation' : 'same';
+                const funcSpeedup = func.unopt_cycles_total > 0 && func.opt_cycles_total > 0 ?
+                    (func.unopt_cycles_total / func.opt_cycles_total).toFixed(2) : 'N/A';
+
+                return `
+                            <tr>
+                                <td><strong>${func.function_name}</strong></td>
+                                <td>${func.unopt_execution_count}</td>
+                                <td>${func.unopt_cycles_total.toLocaleString()}</td>
+                                <td>${func.unopt_cycles_avg.toFixed(2)}</td>
+                                <td>${func.opt_execution_count}</td>
+                                <td>${func.opt_cycles_total.toLocaleString()}</td>
+                                <td>${func.opt_cycles_avg.toFixed(2)}</td>
+                                <td class="cycle-diff ${cyclesDiffClass}">${cycleDiff >= 0 ? '+' : ''}${cycleDiff.toLocaleString()}</td>
+                                <td class="cycle-diff ${cycleDiff < 0 ? 'improvement' : cycleDiff > 0 ? 'degradation' : 'same'}">${funcSpeedup}x</td>
+                            </tr>
+                        `}).join('')}
+                    </tbody>
+                </table>
+            `;
+
+            return html;
+        }
+
+        function renderSingleVersionFunctions(data, versionName) {
+            if (!data?.functions) return '<div class="error">No function data available</div>';
+
+            const functions = Object.values(data.functions);
+            const startFunction = functions.find(f => f.function_name === 'main');
+            const totalCycles = startFunction ? Math.round(startFunction.execution_cycles_total || 0) : 0;
+
+            const sortedFunctions = functions.sort((a, b) =>
+                (b.execution_cycles_total || 0) - (a.execution_cycles_total || 0)
+            );
+
+            let html = `
+                <div class="comparison-header">
+                    <h3>${versionName} Version Functions</h3>
+                    <span class="version-badge ${versionName.toLowerCase() === 'optimized' ? 'opt' : 'unopt'}">
+                        Total Cycles: ${totalCycles.toLocaleString()}
+                    </span>
+                </div>
+                
+                <table class="function-table">
+                    <thead>
+                        <tr>
+                            <th>Function Name</th>
+                            <th>Execution Count</th>
+                            <th>Total Cycles</th>
+                            <th>Avg Cycles</th>
+                            <th>Cycle %</th>
+                            <th>Callees</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${sortedFunctions.filter(func => {
+                const cycles = Math.round(func.execution_cycles_total || 0);
+                const percentage = totalCycles > 0 ? (cycles / totalCycles * 100) : 0;
+                return percentage <= 100;
+            }).map(func => {
+                const cycles = Math.round(func.execution_cycles_total || 0);
+                const percentage = totalCycles > 0 ? (cycles / totalCycles * 100) : 0;
+                return `
+                            <tr>
+                                <td><strong>${func.function_name}</strong></td>
+                                <td>${func.execution_count}</td>
+                                <td>${cycles.toLocaleString()}</td>
+                                <td>${func.execution_cycles_avg?.toFixed(2) || '0'}</td>
+                                <td>
+                                    <div style="display: flex; align-items: center; min-width: 200px;">
+                                        <div class="percent-bar">
+                                            <div class="percent-fill" style="width: ${Math.min(percentage * 1.3, 100)}%;">
+                                                ${percentage > 5 ? `${percentage.toFixed(1)}%` : ''}
+                                            </div>
+                                        </div>
+                                        <span class="percent-text">${percentage.toFixed(1)}%</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    ${func.callees_total ?
+                        Object.entries(func.callees_total).map(([callee, count]) =>
+                            `<div class="callee-info">${callee}: ${count} calls${func.callees_cycle_total?.[callee] ? ` (${Math.round(func.callees_cycle_total[callee]).toLocaleString()} cycles)` : ''}</div>`
+                        ).join('')
+                        : 'None'}
+                                </td>
+                            </tr>
+                        `}).join('')}
+                    </tbody>
+                </table>
+            `;
+
+            return html;
+        }
+
+        function renderISAXView() {
+            if (!unoptData || !optData) return;
+
+            const container = document.getElementById('isax-tab');
+            const controls = container.querySelector('.data-toggle');
+
+            let html = '';
+
+            if (currentISAXView === 'both') {
+                html = renderISAXComparison();
+            } else if (currentISAXView === 'unopt') {
+                html = renderSingleVersionISAX(unoptData, 'Unoptimized');
+            } else {
+                html = renderSingleVersionISAX(optData, 'Optimized');
+            }
+
+            container.innerHTML = '';
+            container.appendChild(controls);
+            container.insertAdjacentHTML('beforeend', html);
+        }
+
+        function renderISAXComparison() {
+            const unoptISAX = unoptData?.isax ? Object.values(unoptData.isax) : [];
+            const optISAX = optData?.isax ? Object.values(optData.isax) : [];
+
+            if (unoptISAX.length === 0 && optISAX.length === 0) {
+                return '<div style="text-align: center; padding: 50px;"><h2>ISAX View</h2><p>No ISAX instructions found in either version.</p></div>';
+            }
+
+            // Find total cycles for percentage calculation
+            const unoptFunctions = unoptData?.functions ? Object.values(unoptData.functions) : [];
+            const optFunctions = optData?.functions ? Object.values(optData.functions) : [];
+            const unoptMain = unoptFunctions.find(f => f.function_name === 'main');
+            const optMain = optFunctions.find(f => f.function_name === 'main');
+            const unoptTotalCycles = unoptMain ? Math.round(unoptMain.execution_cycles_total || 0) : 0;
+            const optTotalCycles = optMain ? Math.round(optMain.execution_cycles_total || 0) : 0;
+
+            let html = `
+                <div style="margin-bottom: 20px;">
+                    <h2>ISAX Instructions Analysis - Comparison</h2>
+                    <div style="margin-top: 10px;">
+                        <span class="version-badge unopt">Unoptimized: ${unoptISAX.length} instructions</span>
+                        <span class="version-badge opt">Optimized: ${optISAX.length} instructions</span>
+                    </div>
+                </div>
+            `;
+
+            if (optISAX.length > 0) {
+                const sortedISAX = optISAX.sort((a, b) =>
+                    (b.execution_count || 0) - (a.execution_count || 0)
+                );
+
+                html += `
+                    <table class="function-table">
+                        <thead>
+                            <tr>
+                                <th>Address (PC)</th>
+                                <th>Instruction</th>
+                                <th>Execution Count</th>
+                                <th>CPI</th>
+                                <th>Total Cycles</th>
+                                <th>Cycle %</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${sortedISAX.map(isax => {
+                    const cycles = Math.round((isax.execution_count || 0) * (isax.average_execution_cycles || 0));
+                    const percentage = optTotalCycles > 0 ? (cycles / optTotalCycles * 100) : 0;
+                    return `
+                                <tr>
+                                    <td><code>${isax.pc}</code></td>
+                                    <td><code>${isax.instruction}</code></td>
+                                    <td>${isax.execution_count}</td>
+                                    <td>${isax.average_execution_cycles}</td>
+                                    <td>${cycles.toLocaleString()}</td>
+                                    <td>
+                                        <div style="display: flex; align-items: center; min-width: 200px;">
+                                            <div class="percent-bar">
+                                                <div class="percent-fill" style="width: ${Math.min(percentage * 1.3, 100)}%;">
+                                                    ${percentage > 1 ? `${percentage.toFixed(1)}%` : ''}
+                                                </div>
+                                            </div>
+                                            <span class="percent-text">${percentage.toFixed(1)}%</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `}).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } else {
+                html += '<div style="text-align: center; padding: 30px; background: #f8f9fa; border-radius: 8px;">No ISAX instructions found in optimized version.</div>';
+            }
+
+            html += `
+                <div style="margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 8px;">
+                    <strong>Total ISAX instructions (Opt):</strong> ${optISAX.length}<br>
+                    <strong>Total ISAX executions (Opt):</strong> ${optISAX.reduce((sum, isax) => sum + (isax.execution_count || 0), 0).toLocaleString()}<br>
+                    <strong>Total cycles comparison:</strong> Unopt: ${unoptTotalCycles.toLocaleString()}, Opt: ${optTotalCycles.toLocaleString()}
+                </div>
+            `;
+
+            return html;
+        }
+
+        function renderSingleVersionISAX(data, versionName) {
+            const isaxInstructions = data?.isax ? Object.values(data.isax) : [];
+
+            if (isaxInstructions.length === 0) {
+                return `<div style="text-align: center; padding: 50px;">
+                    <h2>ISAX View - ${versionName}</h2>
+                    <p>No ISAX instructions found in ${versionName.toLowerCase()} version.</p>
+                </div>`;
+            }
+
+            const functions = data?.functions ? Object.values(data.functions) : [];
+            const startFunction = functions.find(f => f.function_name === 'main');
+            const totalCycles = startFunction ? Math.round(startFunction.execution_cycles_total || 0) : 0;
+
+            const sortedISAX = isaxInstructions.sort((a, b) =>
+                (b.execution_count || 0) - (a.execution_count || 0)
+            );
+
+            let html = `
+                <div style="margin-bottom: 20px;">
+                    <h2>ISAX Instructions Analysis - ${versionName}</h2>
+                    <p>Custom instructions generated by APS</p>
+                </div>
+                
+                <table class="function-table">
+                    <thead>
+                        <tr>
+                            <th>Address (PC)</th>
+                            <th>Instruction</th>
+                            <th>Execution Count</th>
+                            <th>CPI</th>
+                            <th>Total Cycles</th>
+                            <th>Cycle %</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${sortedISAX.map(isax => {
+                const cycles = Math.round((isax.execution_count || 0) * (isax.average_execution_cycles || 0));
+                const percentage = totalCycles > 0 ? (cycles / totalCycles * 100) : 0;
+                return `
+                            <tr>
+                                <td><code>${isax.pc}</code></td>
+                                <td><code>${isax.instruction}</code></td>
+                                <td>${isax.execution_count}</td>
+                                <td>${isax.average_execution_cycles}</td>
+                                <td>${cycles.toLocaleString()}</td>
+                                <td>
+                                    <div style="display: flex; align-items: center; min-width: 200px;">
+                                        <div class="percent-bar">
+                                            <div class="percent-fill" style="width: ${Math.min(percentage * 1.3, 100)}%;">
+                                                ${percentage > 1 ? `${percentage.toFixed(1)}%` : ''}
+                                            </div>
+                                        </div>
+                                        <span class="percent-text">${percentage.toFixed(1)}%</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        `}).join('')}
+                    </tbody>
+                </table>
+                
+                <div style="margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 8px;">
+                    <strong>Total ISAX instructions:</strong> ${sortedISAX.length}<br>
+                    <strong>Total ISAX executions:</strong> ${sortedISAX.reduce((sum, isax) => sum + (isax.execution_count || 0), 0).toLocaleString()}<br>
+                    <strong>Total cycles:</strong> ${totalCycles.toLocaleString()}
+                </div>
+            `;
+
+            return html;
+        }
+
+        function renderComparisonView() {
+            if (!unoptData || !optData) return;
+
+            const container = document.getElementById('comparison-tab');
+
+            // Calculate key metrics
+            const unoptFunctions = Object.values(unoptData.functions || {});
+            const optFunctions = Object.values(optData.functions || {});
+
+            const unoptMain = unoptFunctions.find(f => f.function_name === 'main');
+            const optMain = optFunctions.find(f => f.function_name === 'main');
+
+            const unoptTotalCycles = unoptMain ? Math.round(unoptMain.execution_cycles_total || 0) : 0;
+            const optTotalCycles = optMain ? Math.round(optMain.execution_cycles_total || 0) : 0;
+
+            const speedup = unoptTotalCycles > 0 && optTotalCycles > 0 ?
+                (unoptTotalCycles / optTotalCycles) : 0;
+            const improvement = unoptTotalCycles > 0 ?
+                ((unoptTotalCycles - optTotalCycles) / unoptTotalCycles * 100) : 0;
+
+            const unoptInstructionCount = Object.keys(unoptData.instructions || {}).length;
+            const optInstructionCount = Object.keys(optData.instructions || {}).length;
+
+            const unoptISAXCount = Object.keys(unoptData.isax || {}).length;
+            const optISAXCount = Object.keys(optData.isax || {}).length;
+
+            let html = `
+                <div style="max-width: 800px; margin: 0 auto;">
+                    <h2 style="text-align: center; margin-bottom: 30px;">Performance Comparison Summary</h2>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                        <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                            <h3 style="color: #ff3b30; margin-bottom: 15px;">Unoptimized Version</h3>
+                            <div style="font-size: 14px; line-height: 1.8;">
+                                <div><strong>Total Cycles:</strong> ${unoptTotalCycles.toLocaleString()}</div>
+                                <div><strong>Instructions:</strong> ${unoptInstructionCount}</div>
+                                <div><strong>ISAX Instructions:</strong> ${unoptISAXCount}</div>
+                                <div><strong>Functions:</strong> ${unoptFunctions.length}</div>
+                            </div>
+                        </div>
+                        
+                        <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                            <h3 style="color: #007aff; margin-bottom: 15px;">Optimized Version</h3>
+                            <div style="font-size: 14px; line-height: 1.8;">
+                                <div><strong>Total Cycles:</strong> ${optTotalCycles.toLocaleString()}</div>
+                                <div><strong>Instructions:</strong> ${optInstructionCount}</div>
+                                <div><strong>ISAX Instructions:</strong> ${optISAXCount}</div>
+                                <div><strong>Functions:</strong> ${optFunctions.length}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, #28a745, #20c997); color: white; padding: 30px; border-radius: 12px; text-align: center; margin-bottom: 30px;">
+                        <h3 style="margin-bottom: 15px;">Performance Improvement</h3>
+                        <div style="font-size: 32px; font-weight: bold; margin-bottom: 10px;">${speedup.toFixed(2)}x</div>
+                        <div style="font-size: 18px;">Speedup</div>
+                        <div style="font-size: 16px; margin-top: 10px; opacity: 0.9;">
+                            Performance improved by ${improvement.toFixed(1)}% (saved ${(unoptTotalCycles - optTotalCycles).toLocaleString()} cycles)
+                        </div>
+                    </div>
+                    
+                    <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                        <h3 style="margin-bottom: 15px;">Detailed Comparison</h3>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background: #f8f9fa;">
+                                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #dee2e6;">Metric</th>
+                                    <th style="padding: 12px; text-align: center; border-bottom: 2px solid #dee2e6;">Unoptimized</th>
+                                    <th style="padding: 12px; text-align: center; border-bottom: 2px solid #dee2e6;">Optimized</th>
+                                    <th style="padding: 12px; text-align: center; border-bottom: 2px solid #dee2e6;">Change</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="padding: 12px; border-bottom: 1px solid #dee2e6;"><strong>Total Execution Cycles</strong></td>
+                                    <td style="padding: 12px; text-align: center; border-bottom: 1px solid #dee2e6;">${unoptTotalCycles.toLocaleString()}</td>
+                                    <td style="padding: 12px; text-align: center; border-bottom: 1px solid #dee2e6;">${optTotalCycles.toLocaleString()}</td>
+                                    <td style="padding: 12px; text-align: center; border-bottom: 1px solid #dee2e6; color: #28a745; font-weight: bold;">
+                                        -${(unoptTotalCycles - optTotalCycles).toLocaleString()} (-${improvement.toFixed(1)}%)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 12px; border-bottom: 1px solid #dee2e6;"><strong>Total Instructions</strong></td>
+                                    <td style="padding: 12px; text-align: center; border-bottom: 1px solid #dee2e6;">${unoptInstructionCount}</td>
+                                    <td style="padding: 12px; text-align: center; border-bottom: 1px solid #dee2e6;">${optInstructionCount}</td>
+                                    <td style="padding: 12px; text-align: center; border-bottom: 1px solid #dee2e6;">
+                                        ${optInstructionCount - unoptInstructionCount >= 0 ? '+' : ''}${optInstructionCount - unoptInstructionCount}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 12px; border-bottom: 1px solid #dee2e6;"><strong>ISAX Instructions</strong></td>
+                                    <td style="padding: 12px; text-align: center; border-bottom: 1px solid #dee2e6;">${unoptISAXCount}</td>
+                                    <td style="padding: 12px; text-align: center; border-bottom: 1px solid #dee2e6;">${optISAXCount}</td>
+                                    <td style="padding: 12px; text-align: center; border-bottom: 1px solid #dee2e6; ${optISAXCount > unoptISAXCount ? 'color: #007aff; font-weight: bold;' : ''}">
+                                        ${optISAXCount - unoptISAXCount >= 0 ? '+' : ''}${optISAXCount - unoptISAXCount}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function toggleFunction(funcId) {
+            const content = document.getElementById(funcId);
+            const header = content.previousElementSibling;
+            const icon = header.querySelector('.toggle-icon');
+
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                icon.textContent = '▼';
+            } else {
+                content.classList.add('expanded');
+                icon.textContent = '▲';
+            }
+        }
+
+        async function openFileModal(filePath, fileLabel) {
+            const modal = document.getElementById('fileModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const fileContent = document.getElementById('fileContent');
+
+            modalTitle.textContent = `${fileLabel}: ${filePath}`;
+            fileContent.innerHTML = '<div class="loading-text">Loading file...</div>';
+            modal.style.display = 'block';
+
+            try {
+                const response = await fetch(filePath);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const content = await response.text();
+                const lines = content.split('\n');
+
+                // Get file extension for syntax highlighting hints
+                const extension = filePath.split('.').pop().toLowerCase();
+
+                let formattedContent = '';
+                lines.forEach((line, index) => {
+                    const lineNumber = (index + 1).toString().padStart(4, ' ');
+                    const escapedLine = escapeHtml(line);
+                    formattedContent += `<span class="code-line"><span class="line-numbers">${lineNumber}</span>${escapedLine}</span>\n`;
+                });
+
+                fileContent.innerHTML = `<pre class="code-container">${formattedContent}</pre>`;
+
+            } catch (error) {
+                console.error('Error loading file:', error);
+                fileContent.innerHTML = `<div class="error-text">Error loading file: ${error.message}<br><br>Make sure the file exists and is accessible from the web server.</div>`;
+            }
+        }
+
+        function closeFileModal() {
+            const modal = document.getElementById('fileModal');
+            modal.style.display = 'none';
+        }
+
+        function toggleFilePanel() {
+            const fileBox = document.getElementById('fileInfoBox');
+            const header = fileBox.querySelector('h3');
+            const icon = header.querySelector('.toggle-icon');
+
+            fileBox.classList.toggle('collapsed');
+            header.classList.toggle('collapsed');
+
+            if (fileBox.classList.contains('collapsed')) {
+                icon.textContent = '▶';
+            } else {
+                icon.textContent = '▼';
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Close modal when clicking outside of it
+        window.onclick = function (event) {
+            const modal = document.getElementById('fileModal');
+            if (event.target === modal) {
+                closeFileModal();
+            }
+        }
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') {
+                closeFileModal();
+            }
+        });
+
+        function showLevel1Tab(sectionName) {
+            // Hide all level 1 sections
+            document.querySelectorAll('.level1-tab-content').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Remove active class from all level 1 buttons
+            document.querySelectorAll('.level1-tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // Show selected section
+            document.getElementById(sectionName + '-section').classList.add('active');
+
+            // Add active class to selected button
+            event.target.classList.add('active');
+        }
+
+        function showLevel2Tab(sectionName, tabName) {
+            // Hide all tabs within the section
+            const section = document.getElementById(sectionName + '-section');
+            section.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Remove active class from all level 2 buttons in this section
+            section.querySelectorAll('.level2-tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(sectionName + '-' + tabName + '-tab').classList.add('active');
+
+            // Add active class to selected button
+            event.target.classList.add('active');
+        }
+
+        // Update existing functions to use new IDs
+        function toggleVersion(element, version) {
+            const section = document.getElementById('performance-section');
+            section.querySelectorAll('.version-toggle').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+            currentInstructionView = version;
+            renderInstructionView();
+        }
+
+        function toggleFunctionData(view) {
+            const section = document.getElementById('performance-section');
+            section.querySelectorAll('#performance-function-tab .toggle-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            currentFunctionView = view;
+            renderFunctionView();
+        }
+
+        function toggleISAXData(view) {
+            const section = document.getElementById('performance-section');
+            section.querySelectorAll('#performance-isax-tab .toggle-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            currentISAXView = view;
+            renderISAXView();
+        }
+
+        // Update render functions to use new IDs
+        function renderInstructionView() {
+            if (!unoptData || !optData) return;
+
+            const container = document.getElementById('performance-instruction-tab');
+            const versionControls = container.querySelector('.version-controls');
+
+            let html = '';
+
+            if (currentInstructionView === 'both') {
+                html = renderInstructionComparison();
+            } else if (currentInstructionView === 'unopt') {
+                html = renderSingleVersionInstructions(unoptData, 'Unoptimized');
+            } else {
+                html = renderSingleVersionInstructions(optData, 'Optimized');
+            }
+
+            container.innerHTML = '';
+            container.appendChild(versionControls);
+            container.insertAdjacentHTML('beforeend', html);
+        }
+
+        function renderFunctionView() {
+            if (!unoptData || !optData) return;
+
+            const container = document.getElementById('performance-function-tab');
+            const controls = container.querySelector('.data-toggle');
+
+            let html = '';
+
+            if (currentFunctionView === 'both') {
+                html = renderFunctionComparison();
+            } else if (currentFunctionView === 'unopt') {
+                html = renderSingleVersionFunctions(unoptData, 'Unoptimized');
+            } else {
+                html = renderSingleVersionFunctions(optData, 'Optimized');
+            }
+
+            container.innerHTML = '';
+            container.appendChild(controls);
+            container.insertAdjacentHTML('beforeend', html);
+        }
+
+        function renderISAXView() {
+            if (!unoptData || !optData) return;
+
+            const container = document.getElementById('performance-isax-tab');
+            const controls = container.querySelector('.data-toggle');
+
+            let html = '';
+
+            if (currentISAXView === 'both') {
+                html = renderISAXComparison();
+            } else if (currentISAXView === 'unopt') {
+                html = renderSingleVersionISAX(unoptData, 'Unoptimized');
+            } else {
+                html = renderSingleVersionISAX(optData, 'Optimized');
+            }
+
+            container.innerHTML = '';
+            container.appendChild(controls);
+            container.insertAdjacentHTML('beforeend', html);
+        }
+
+        function renderComparisonView() {
+            if (!unoptData || !optData) return;
+
+            const container = document.getElementById('performance-summary-tab');
+
+            // Calculate key metrics
+            const unoptFunctions = Object.values(unoptData.functions || {});
+            const optFunctions = Object.values(optData.functions || {});
+
+            const unoptMain = unoptFunctions.find(f => f.function_name === 'main');
+            const optMain = optFunctions.find(f => f.function_name === 'main');
+
+            const unoptTotalCycles = unoptMain ? Math.round(unoptMain.execution_cycles_total || 0) : 0;
+            const optTotalCycles = optMain ? Math.round(optMain.execution_cycles_total || 0) : 0;
+
+            const speedup = unoptTotalCycles > 0 && optTotalCycles > 0 ?
+                (unoptTotalCycles / optTotalCycles) : 0;
+            const improvement = unoptTotalCycles > 0 ?
+                ((unoptTotalCycles - optTotalCycles) / unoptTotalCycles * 100) : 0;
+
+            const unoptInstructionCount = Object.keys(unoptData.instructions || {}).length;
+            const optInstructionCount = Object.keys(optData.instructions || {}).length;
+
+            const unoptISAXCount = Object.keys(unoptData.isax || {}).length;
+            const optISAXCount = Object.keys(optData.isax || {}).length;
+
+            let html = `
+                <div style="max-width: 800px; margin: 0 auto;">
+                    <h2 style="text-align: center; margin-bottom: 30px;">Performance Comparison Summary</h2>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                        <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                            <h3 style="color: #ff3b30; margin-bottom: 15px;">Unoptimized Version</h3>
+                            <div style="font-size: 14px; line-height: 1.8;">
+                                <div><strong>Total Cycles:</strong> ${unoptTotalCycles.toLocaleString()}</div>
+                                <div><strong>Instructions:</strong> ${unoptInstructionCount}</div>
+                                <div><strong>ISAX Instructions:</strong> ${unoptISAXCount}</div>
+                                <div><strong>Functions:</strong> ${unoptFunctions.length}</div>
+                            </div>
+                        </div>
+                        
+                        <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                            <h3 style="color: #007aff; margin-bottom: 15px;">Optimized Version</h3>
+                            <div style="font-size: 14px; line-height: 1.8;">
+                                <div><strong>Total Cycles:</strong> ${optTotalCycles.toLocaleString()}</div>
+                                <div><strong>Instructions:</strong> ${optInstructionCount}</div>
+                                <div><strong>ISAX Instructions:</strong> ${optISAXCount}</div>
+                                <div><strong>Functions:</strong> ${optFunctions.length}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, #28a745, #20c997); color: white; padding: 30px; border-radius: 12px; text-align: center; margin-bottom: 30px;">
+                        <h3 style="margin-bottom: 15px;">Performance Improvement</h3>
+                        <div style="font-size: 32px; font-weight: bold; margin-bottom: 10px;">${speedup.toFixed(2)}x</div>
+                        <div style="font-size: 18px;">Speedup</div>
+                        <div style="font-size: 16px; margin-top: 10px; opacity: 0.9;">
+                            Performance improved by ${improvement.toFixed(1)}% (saved ${(unoptTotalCycles - optTotalCycles).toLocaleString()} cycles)
+                        </div>
+                    </div>
+                    
+                    <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                        <h3 style="margin-bottom: 15px;">Detailed Comparison</h3>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background: #f8f9fa;">
+                                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #dee2e6;">Metric</th>
+                                    <th style="padding: 12px; text-align: center; border-bottom: 2px solid #dee2e6;">Unoptimized</th>
+                                    <th style="padding: 12px; text-align: center; border-bottom: 2px solid #dee2e6;">Optimized</th>
+                                    <th style="padding: 12px; text-align: center; border-bottom: 2px solid #dee2e6;">Change</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="padding: 12px; border-bottom: 1px solid #dee2e6;"><strong>Total Execution Cycles</strong></td>
+                                    <td style="padding: 12px; text-align: center; border-bottom: 1px solid #dee2e6;">${unoptTotalCycles.toLocaleString()}</td>
+                                    <td style="padding: 12px; text-align: center; border-bottom: 1px solid #dee2e6;">${optTotalCycles.toLocaleString()}</td>
+                                    <td style="padding: 12px; text-align: center; border-bottom: 1px solid #dee2e6; color: #28a745; font-weight: bold;">
+                                        -${(unoptTotalCycles - optTotalCycles).toLocaleString()} (-${improvement.toFixed(1)}%)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 12px; border-bottom: 1px solid #dee2e6;"><strong>Total Instructions</strong></td>
+                                    <td style="padding: 12px; text-align: center; border-bottom: 1px solid #dee2e6;">${unoptInstructionCount}</td>
+                                    <td style="padding: 12px; text-align: center; border-bottom: 1px solid #dee2e6;">${optInstructionCount}</td>
+                                    <td style="padding: 12px; text-align: center; border-bottom: 1px solid #dee2e6;">
+                                        ${optInstructionCount - unoptInstructionCount >= 0 ? '+' : ''}${optInstructionCount - unoptInstructionCount}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 12px; border-bottom: 1px solid #dee2e6;"><strong>ISAX Instructions</strong></td>
+                                    <td style="padding: 12px; text-align: center; border-bottom: 1px solid #dee2e6;">${unoptISAXCount}</td>
+                                    <td style="padding: 12px; text-align: center; border-bottom: 1px solid #dee2e6;">${optISAXCount}</td>
+                                    <td style="padding: 12px; text-align: center; border-bottom: 1px solid #dee2e6; ${optISAXCount > unoptISAXCount ? 'color: #007aff; font-weight: bold;' : ''}">
+                                        ${optISAXCount - unoptISAXCount >= 0 ? '+' : ''}${optISAXCount - unoptISAXCount}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function toggleSynthesisPanel(panelId) {
+            const panel = document.getElementById(panelId);
+            const header = panel.parentElement.querySelector('h3');
+            const icon = header.querySelector('.toggle-icon');
+
+            if (panel.style.display === 'none' || panel.classList.contains('collapsed')) {
+                panel.style.display = 'block';
+                panel.classList.remove('collapsed');
+                icon.textContent = '▼';
+            } else {
+                panel.style.display = 'none';
+                panel.classList.add('collapsed');
+                icon.textContent = '▶';
+            }
+        }
+
+        function formatOpcodeVerilog(opcode) {
+            // Convert decimal opcode to 7-bit binary format: 7'bxxxxxxx
+            const binary = parseInt(opcode).toString(2).padStart(7, '0');
+            return `7'b${binary}`;
+        }
+
+        async function loadSynthesisData() {
+            try {
+                // Load ISAXes
+                const isaxesResponse = await fetch('../synth/isaxes.csv');
+                const isaxesText = await isaxesResponse.text();
+                const isaxesData = parseCSV(isaxesText);
+                renderISAXes(isaxesData);
+
+                // Load Instances
+                const instancesResponse = await fetch('../synth/instances.csv');
+                const instancesText = await instancesResponse.text();
+                const instancesData = parseCSV(instancesText);
+                renderInstances(instancesData);
+            } catch (error) {
+                console.error('Error loading synthesis data:', error);
+                document.querySelectorAll('#synthesis-section .loading').forEach(el => {
+                    el.className = 'error';
+                    el.textContent = 'Error loading synthesis data: ' + error.message;
+                });
+            }
+        }
+
+        async function loadCompilationReports() {
+            try {
+                let files = getFileList();
+                // Load Pattern Match Report
+                const patmatchResponse = await fetch(files.patMatchRpt);
+                const patmatchText = await patmatchResponse.text();
+                renderCompilationReport('patmatch-content', patmatchText, 'Pattern Match Report');
+
+                // Load Vector Report
+                const vecResponse = await fetch(files.vecRpt);
+                const vecText = await vecResponse.text();
+                renderCompilationReport('vec-content', vecText, 'Vectorization Report');
+
+            } catch (error) {
+                console.error('Error loading compilation reports:', error);
+                document.querySelectorAll('#compilation-section .loading').forEach(el => {
+                    el.className = 'error';
+                    el.textContent = 'Error loading compilation reports: ' + error.message;
+                });
+            }
+        }
+
+        async function loadASICReports() {
+            try {
+                let files = getFileList();
+                const rptResponse = await fetch(files.asicRptFinal);
+                const rptText = await rptResponse.text();
+                renderASICReport('asic-image-content', "asic_layout_image", 'ASIC Layout Image');
+                renderASICReport('asic-summary-content', rptText, 'ASIC Summary');
+                renderASICReport('asic-area-content', rptText, 'ASIC Area');
+                renderASICReport('asic-timing-content', rptText, 'ASIC Timing');
+            } catch (error) {
+                console.error('Error loading ASIC reports:', error);
+                document.querySelectorAll('#implementation-section .loading').forEach(el => {
+                    el.className = 'error';
+                    el.textContent = 'Error loading ASIC reports: ' + error.message;
+                });
+            }
+        }
+
+        function parsePatternMatchReport(diffString) {
+            const firstEOL = diffString.indexOf('\n');
+            const firstLine = firstEOL === -1 ? diffString : diffString.slice(0, firstEOL);
+
+            // If the report starts with "No", just show that single line
+            if (firstLine.trim().startsWith('No')) {
+                return `
+<div style="display:flex; justify-content:center; padding: 24px; background: #f9fafb;">
+  <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #fff; color: #222; padding: 20px; border-radius: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); max-width: 900px; width: 100%;">
+    <div style="color:#6b7280; font-size: 14px;">${firstLine.trim()}</div>
+  </div>
+</div>`;
+            }
+            const lines = diffString.split('\n');
+
+            let originalHeader = '';
+            let replacedHeader = '';
+            let originalLines = [];
+            let replacedLines = [];
+
+            let mode = 'start';
+
+            for (const line of lines) {
+                if (line.trim() === '') continue;
+
+                if (mode === 'start' && line.startsWith('[')) {
+                    originalHeader = line.trim();
+                    mode = 'original';
+                    continue;
+                }
+                if (mode === 'original' && line.toLowerCase().includes('replaced with')) {
+                    mode = 'replaced_header';
+                    continue;
+                }
+                if (mode === 'replaced_header' && line.trim().startsWith('[')) {
+                    replacedHeader = line.trim();
+                    mode = 'replaced';
+                    continue;
+                }
+                if (mode === 'original') {
+                    originalLines.push(line);
+                } else if (mode === 'replaced') {
+                    replacedLines.push(line);
+                }
+            }
+
+            function parseOriginalLine(line) {
+                const m = line.match(/^(\d+):\s?(.*)$/);
+                if (m) return [m[1], m[2]];
+                return ['', line];
+            }
+
+            // For replaced lines, we will number lines starting from 1 (or 0) because
+            // no line numbers provided in input for replaced code.
+            // You can modify to parse them if they exist in input.
+            function escapeHtml(text) {
+                return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            }
+
+            const originalHtmlLines = originalLines.map(line => {
+                const [num, code] = parseOriginalLine(line);
+                return `<div style="display:flex;">
+            <div style="width: 30px; color:#666; user-select:none;">${num}</div>
+            <pre style="margin:0; white-space:pre-wrap; flex:1; color:#222;">${escapeHtml(code)}</pre>
+            </div>`;
+            }).join('\n');
+
+            const replacedHtmlLines = replacedLines.map((line, i) => {
+                const lineno = i + 1;
+                return `<div style="display:flex;">
+            <div style="width: 30px; color:#666; user-select:none;">${lineno}</div>
+            <pre style="margin:0; white-space:pre-wrap; flex:1; color:#222;">${escapeHtml(line)}</pre>
+            </div>`;
+            }).join('\n');
+
+            return `
+        <div style="display:flex; justify-content:center; padding: 24px; background: #f9fafb;">
+        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #fff; color: #222; padding: 20px; border-radius: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); width: 100%;">
+            <div style="display: flex; gap: 20px;">
+            <div style="flex: 1; background: #f0f3f7; border-radius: 6px; padding: 16px; overflow-x:auto; box-shadow: inset 0 0 5px #d1d9e6;">
+                <div style="color: #6b7280; margin-bottom: 8px; font-weight: 600;">Original</div>
+                <div style="color:#0b63ce; font-weight: 600; margin-bottom: 8px;">
+                ${escapeHtml(originalHeader)}
+                </div>
+                ${originalHtmlLines}
+            </div>
+            <div style="flex: 1; background: #f0f3f7; border-radius: 6px; padding: 16px; overflow-x:auto; box-shadow: inset 0 0 5px #d1d9e6;">
+                <div style="color: #6b7280; margin-bottom: 8px; font-weight: 600;">Replaced with</div>
+                <div style="color:#0b63ce; font-weight: 600; margin-bottom: 8px;">
+                ${escapeHtml(replacedHeader)}
+                </div>
+                ${replacedHtmlLines}
+            </div>
+            </div>
+        </div>
+        </div>
+        `;
+        }
+
+        function parseVectorizationReport(diffString) {
+            const firstEOL = diffString.indexOf('\n');
+            const firstLine = firstEOL === -1 ? diffString : diffString.slice(0, firstEOL);
+
+            // If the report starts with "No", just show that single line
+            if (firstLine.trim().startsWith('No')) {
+                return `
+<div style="display:flex; justify-content:center; padding: 24px; background: #f9fafb;">
+  <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #fff; color: #222; padding: 20px; border-radius: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); max-width: 900px; width: 100%;">
+    <div style="color:#6b7280; font-size: 14px;">${firstLine.trim()}</div>
+  </div>
+</div>`;
+            }
+            const lines = diffString.split('\n');
+
+            // Collect diagnostics
+            const diagnostics = [];
+            let originalHeader = '';
+            let originalLines = [];
+            let vectorizedHeader = '';
+            let vectorizedLines = [];
+            let mode = 'diagnostics';
+
+            for (const line of lines) {
+                if (line.trim() === '') continue;
+
+                // Detect start of original code block
+                if (line.startsWith('[') && line.includes('From line')) {
+                    originalHeader = line.trim();
+                    mode = 'original';
+                    continue;
+                }
+
+                // Detect arrow separator
+                if (line.trim() === '------------------------------------->') {
+                    mode = 'vectorized_header';
+                    continue;
+                }
+
+                // Detect vectorized code block header
+                if (mode === 'vectorized_header' && line.startsWith('[')) {
+                    vectorizedHeader = line.trim();
+                    mode = 'vectorized';
+                    continue;
+                }
+
+                if (mode === 'diagnostics') {
+                    diagnostics.push(line);
+                } else if (mode === 'original') {
+                    originalLines.push(line);
+                } else if (mode === 'vectorized') {
+                    vectorizedLines.push(line);
+                }
+            }
+
+            function parseOriginalLine(line) {
+                const m = line.match(/^(\d+):\s?(.*)$/);
+                if (m) return [m[1], m[2]];
+                return ['', line];
+            }
+
+            function escapeHtml(text) {
+                return text
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;');
+            }
+
+            const diagnosticsHtml = diagnostics
+                .map(d => `<div style="margin-bottom: 4px;">${escapeHtml(d)}</div>`)
+                .join('');
+
+            const originalHtmlLines = originalLines
+                .map(line => {
+                    const [num, code] = parseOriginalLine(line);
+                    return `<div style="display:flex;">
+        <div style="width: 30px; color:#666; user-select:none;">${num}</div>
+        <pre style="margin:0; white-space:pre-wrap; flex:1; color:#222;">${escapeHtml(
+                        code
+                    )}</pre>
+      </div>`;
+                })
+                .join('\n');
+
+            const vectorizedHtmlLines = vectorizedLines
+                .map((line, i) => {
+                    const lineno = i + 1;
+                    return `<div style="display:flex;">
+        <div style="width: 30px; color:#666; user-select:none;">${lineno}</div>
+        <pre style="margin:0; white-space:pre-wrap; flex:1; color:#222;">${escapeHtml(
+                        line
+                    )}</pre>
+      </div>`;
+                })
+                .join('\n');
+
+            return `
+<div style="display:flex; justify-content:center; padding: 24px; background: #f9fafb;">
+  <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #fff; color: #222; padding: 20px; border-radius: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); width: 100%;">
+    
+    <!-- Diagnostics -->
+    <div style="margin-bottom: 16px;">
+      <div style="color: #b45309; font-weight: 600; margin-bottom: 8px;">Diagnostics</div>
+      <div style="background: #fffbeb; border-left: 4px solid #f59e0b; padding: 12px; font-size: 14px; color: #92400e;">
+        ${diagnosticsHtml}
+      </div>
+    </div>
+
+    <!-- Diff -->
+    <div style="display: flex; gap: 20px;">
+      <!-- Original -->
+      <div style="flex: 1; background: #f0f3f7; border-radius: 6px; padding: 16px; overflow-x:auto; box-shadow: inset 0 0 5px #d1d9e6;">
+        <div style="color: #6b7280; margin-bottom: 8px; font-weight: 600;">Original</div>
+        <div style="color:#0b63ce; font-weight: 600; margin-bottom: 8px;">${escapeHtml(
+                originalHeader
+            )}</div>
+        ${originalHtmlLines}
+      </div>
+
+      <!-- Vectorized -->
+      <div style="flex: 1; background: #f0f3f7; border-radius: 6px; padding: 16px; overflow-x:auto; box-shadow: inset 0 0 5px #d1d9e6;">
+        <div style="color: #6b7280; margin-bottom: 8px; font-weight: 600;">Vectorized</div>
+        <div style="color:#0b63ce; font-weight: 600; margin-bottom: 8px;">${escapeHtml(
+                vectorizedHeader
+            )}</div>
+        ${vectorizedHtmlLines}
+      </div>
+    </div>
+  </div>
+</div>
+`;
+        }
+
+        function renderCompilationReport(containerId, content, title) {
+            const container = document.getElementById(containerId);
+
+            if (!content || content.trim().length === 0) {
+                container.innerHTML = `<div style="padding: 15px; text-align: center; color: #666;">
+                    ${title} is empty
+                </div>`;
+                return;
+            }
+
+            console.log(title);
+            // Parse pattern match report structure
+            if (title === 'Pattern Match Report') {
+                container.innerHTML = parsePatternMatchReport(content);
+            } else if (title == 'Vectorization Report') {
+                container.innerHTML = parseVectorizationReport(content);
+            } else {
+                // For other reports, use the original simple formatting
+                const lines = content.split('\n');
+                let formattedContent = '';
+
+                lines.forEach(line => {
+                    const trimmedLine = line.trim();
+                    if (trimmedLine.length === 0) {
+                        formattedContent += '<br>';
+                    } else {
+                        // Escape HTML and preserve spaces
+                        const escapedLine = line.replace(/\&/g, '&amp;')
+                            .replace(/\</g, '&lt;')
+                            .replace(/\>/g, '&gt;');
+                        formattedContent += `<div style="font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; font-size: 13px; line-height: 1.4;">${escapedLine}</div>`;
+                    }
+                });
+
+                container.innerHTML = `
+                    <div style="padding: 15px; background: #f8f9fa; border-radius: 8px; max-height: 400px; overflow: auto;">
+                        ${formattedContent}
+                    </div>
+                `;
+            }
+        }
+
+        function parseASICImage() {
+            return `
+<div style="display:flex;justify-content:center;align-items:center;width:100%;height:100%;">
+      <img src="../asic/physical_implementation/07_RocketTile.final.png" alt="Waveform" style="border:1px solid #d1d9e6;border-radius:6px;max-width:25%;height:auto;">
+</div>`;
+        }
+
+        function renderReportUtil(text) {
+            const lines = text.split('\n');
+            let formattedContent = '';
+
+            lines.forEach(line => {
+                const trimmedLine = line.trim();
+                if (trimmedLine.length === 0) {
+                    formattedContent += '<br>';
+                } else {
+                    const escapedLine = line
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        // Tabs: replace with 4 spaces
+                        .replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;')
+                        // Normal spaces: preserve
+                        .replace(/ /g, '&nbsp;');
+                    formattedContent += `<div style="font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; font-size: 13px; line-height: 1.4;">${escapedLine}</div>`;
+                }
+            });
+
+            return `
+        <div style="display: flex; justify-content: center; padding: 20px;">
+            <div style="padding: 15px; background: #f8f9fa; border-radius: 8px; max-height: 400px; overflow: auto; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                ${formattedContent}
+            </div>
+        </div>
+    `;
+        }
+
+        function filterTimingReport(logText) {
+            const lines = logText.split(/\r?\n/);
+            const startRegex = /\.final report_checks -path_delay max/;
+            const endRegex = /\.final report_checks -unconstrained/;
+
+            let capturing = false;
+            const result = [];
+
+            for (const line of lines) {
+                if (startRegex.test(line)) {
+                    capturing = true;
+                }
+
+                if (capturing) {
+                    result.push(line);
+                }
+
+                if (endRegex.test(line)) {
+                    // Remove the end line and stop
+                    result.pop();
+                    break;
+                }
+            }
+
+            return result.join("\n");
+        }
+
+        function filterAreaReport(logText) {
+            const lines = logText.split(/\r?\n/);
+
+            // find the first line that starts with "Hierarchical Area Report"
+            const startIdx = lines.findIndex(line => line.trim() === 'Hierarchical Area Report');
+            if (startIdx === -1) return '';
+
+            // return everything from that line to the end
+            return lines.slice(startIdx).join('\n');
+        }
+        
+        function filterSummaryReport(logText) {
+            const lines = logText.split(/\r?\n/);
+
+            // -------- Timing --------
+            const wnsMatch = logText.match(/\bwns\s+([+-]?\d+(?:\.\d+)?)/i);
+            const timing = wnsMatch ? parseFloat(wnsMatch[1]) : null;
+
+            // -------- Area ----------
+            const areaMatch = logText.match(/Total Active Area:\s*([0-9.]+(?:e[+-]?\d+)?)/i);
+            const area = areaMatch ? parseFloat(areaMatch[1]) : null;
+
+            // -------- Power ---------
+            const totalLine = lines.find(l =>
+                l.trim().startsWith('Total') && l.trim().endsWith('100.0%')
+            );
+            const powerRaw = totalLine
+                ? totalLine.trim().split(/\s+/)[4]
+                : null;
+            const power = powerRaw ? parseFloat(powerRaw) : null;
+
+            // Helper: limit to 3 significant digits
+            const fmt = n => n == null ? '—' : n.toLocaleString(undefined, {
+                maximumSignificantDigits: 3
+            });
+
+            return [
+                `Timing: ${fmt(timing)} ns`,
+                `Area:   ${fmt(area)} µm²`,
+                `Power:  ${fmt(power)} W`
+            ].join('\n');
+        }
+
+        function renderASICReport(containerId, content, title) {
+            const container = document.getElementById(containerId);
+
+            if (!content || content.trim().length === 0) {
+                container.innerHTML = `<div style="padding: 15px; text-align: center; color: #666;">
+                    ${title} is empty
+                </div>`;
+                return;
+            }
+
+            // Parse pattern match report structure
+            if (title === 'ASIC Layout Image') {
+                container.innerHTML = parseASICImage();
+            } else if (title === 'ASIC Summary') {
+                container.innerHTML = renderReportUtil(filterSummaryReport(content));
+            } else if (title === 'ASIC Area') {
+                container.innerHTML = renderReportUtil(filterAreaReport(content));
+            } else if (title === 'ASIC Timing') {
+                container.innerHTML = renderReportUtil(filterTimingReport(content));
+            } else {
+                // For other reports, use the original simple formatting
+                const lines = content.split('\n');
+                let formattedContent = '';
+
+                lines.forEach(line => {
+                    const trimmedLine = line.trim();
+                    if (trimmedLine.length === 0) {
+                        formattedContent += '<br>';
+                    } else {
+                        // Escape HTML and preserve spaces
+                        const escapedLine = line.replace(/\&/g, '&amp;')
+                            .replace(/\</g, '&lt;')
+                            .replace(/\>/g, '&gt;');
+                        formattedContent += `<div style="font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; font-size: 13px; line-height: 1.4;">${escapedLine}</div>`;
+                    }
+                });
+
+                container.innerHTML = `
+                    <div style="padding: 15px; background: #f8f9fa; border-radius: 8px; max-height: 400px; overflow: auto;">
+                        ${formattedContent}
+                    </div>
+                `;
+            }
+        }
+
+        function parseCSV(csvText) {
+            const lines = csvText.trim().split('\n');
+            if (lines.length === 0) return [];
+
+            const headers = lines[0].split(',');
+            const data = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(',');
+                const row = {};
+                headers.forEach((header, index) => {
+                    row[header.trim()] = values[index] ? values[index].trim() : '';
+                });
+                data.push(row);
+            }
+
+            return data;
+        }
+
+        function renderISAXes(data) {
+            const container = document.getElementById('isaxes-panel');
+
+            if (!data || data.length === 0) {
+                container.innerHTML = '<div style="padding: 15px; text-align: center; color: #666;">No ISAXes found</div>';
+                return;
+            }
+
+            let html = `
+                <div style="padding: 15px;">
+                    <table class="function-table" style="margin-bottom: 0;">
+                        <thead>
+                            <tr>
+                                <th>Opcode</th>
+                                <th>Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            data.forEach(isax => {
+                const opcodeFormatted = formatOpcodeVerilog(isax.opcode || '0');
+                html += `
+                    <tr>
+                        <td><code style="font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; background: #f8f9fa; padding: 2px 6px; border-radius: 3px;">${opcodeFormatted}</code></td>
+                        <td><strong>${isax.name || 'N/A'}</strong></td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                        </tbody>
+                    </table>
+                    <div style="margin-top: 10px; font-size: 12px; color: #666; text-align: center;">
+                        Total ISAXes: ${data.length}
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function renderInstances(data) {
+            const container = document.getElementById('instances-panel');
+
+            if (!data || data.length === 0) {
+                container.innerHTML = '<div style="padding: 15px; text-align: center; color: #666;">No global instances found</div>';
+                return;
+            }
+
+            let html = `
+                <div style="padding: 15px;">
+                    <table class="function-table" style="margin-bottom: 0;">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Extra</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            data.forEach(instance => {
+                html += `
+                    <tr>
+                        <td>${instance.id || 'N/A'}</td>
+                        <td><strong>${instance.name || 'N/A'}</strong></td>
+                        <td style="color: #666; font-size: 13px;">${instance.extra || '-'}</td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                        </tbody>
+                    </table>
+                    <div style="margin-top: 10px; font-size: 12px; color: #666; text-align: center;">
+                        Total Instances: ${data.length}
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        // Load data when page loads
+        document.addEventListener('DOMContentLoaded', async function () {
+            loadFileInfo();
+            await loadAnalysisData();
+            await loadSynthesisData();
+            await loadCompilationReports();
+            await loadASICReports();
+        });
+    </script>
+</body>
+
+</html>

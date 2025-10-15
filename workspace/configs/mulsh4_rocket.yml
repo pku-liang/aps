@@ -1,0 +1,17 @@
+general:
+  proj: "mulsh4_rocket"
+  cadl: "mulsh4.cadl"
+  c_file: "mulsh4.c"
+  c_func_eval: "main"
+  platform: "rocc"
+
+synthesis:
+  target-period: 6.0
+  aggressive: false
+
+compile:
+  optimization_level: "O3"
+
+asic:
+  pdk: "sg13g2"
+  target-period: 6.0
