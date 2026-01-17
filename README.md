@@ -1,3 +1,5 @@
+# APS has undergone significant evolution and is now integrated with MLIR. For the latest version and ongoing development, please visit our new repository: [aps-mlir](https://github.com/pku-liang/aps-mlir)
+
 # APS: Agile Processor Synthesis
 
 <div align="center">
